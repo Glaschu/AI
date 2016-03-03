@@ -1,11 +1,62 @@
+globals [
+  sky-top      ;; y coordinate of top row of sky
+  earth-top    ;; y coordinate of top row of earth
+  temperature  ;; overall temperature
+]
+
+breed [Enemies enemy]     ;; breed of Enemies
+
+
+;;
+;; Setup Procedures
+;;
+
+to Setup-Level
+  clear-all
+  ;;set-default-shape Enemies "enemy"
+  setup-world
+  setup-caves
+  reset-ticks
+end
+
+to setup-world
+  set sky-top max-pycor - 0
+  set earth-top max-pycor - 5
+  ask patches [  ;; set colors for the different sections of the world
+    if pycor > sky-top [  ;; space
+      set pcolor scale-color Blue pycor 22 15
+    ]
+  if pycor <= sky-top and pycor >= earth-top [ ;; sky
+      set pcolor scale-color blue pycor -20 20
+    ]
+    if pycor < earth-top
+      [ set pcolor scale-color brown pycor -40 40 ] ;; earth
+
+  ]
+end
+
+to setup-caves
+  set earth-top max-pycor - 7
+  ask patch random-pxcor random-pycor[
+    ifelse pycor < earth-top[
+      set pcolor red
+      ;;pycor + 1 blue
+      ][
+      setup-caves
+      ]
+    ]
+
+
+
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+206
 10
-649
+645
 470
-16
-16
+-1
+-1
 13.0
 1
 10
@@ -16,10 +67,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--16
-16
--16
-16
+0
+32
+-32
+0
 0
 0
 1
