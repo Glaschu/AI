@@ -2,6 +2,8 @@ globals [
   sky-top      ;; y coordinate of top row of sky
   earth-top    ;; y coordinate of top row of earth
   temperature  ;; overall temperature
+  tempx
+  tempy
 ]
 
 breed [Enemies enemy]     ;; breed of Enemies
@@ -37,15 +39,17 @@ end
 
 to setup-caves
   set earth-top max-pycor - 7
-  ask patch random-pxcor random-pycor[
+  set tempx random-pxcor
+  set tempy random-pycor
+  ask patch tempx tempy [
     ifelse pycor < earth-top[
-      set pcolor red
-      ;;pycor + 1 blue
+      set pcolor blue
       ][
       setup-caves
       ]
     ]
-
+  set tempx tempx + 1
+  ask patch tempx tempy [set pcolor blue ]
 
 
 end
@@ -64,15 +68,15 @@ GRAPHICS-WINDOW
 1
 1
 0
-1
-1
+0
+0
 1
 0
 32
 -32
 0
-0
-0
+1
+1
 1
 ticks
 30.0
