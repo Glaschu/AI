@@ -4,6 +4,8 @@ globals [
   temperature  ;; overall temperature
   tempx
   tempy
+  tempbool?
+  bool2?
 ]
 
 breed [Enemies enemy]     ;; breed of Enemies
@@ -17,6 +19,8 @@ to Setup-Level
   clear-all
   ;;set-default-shape Enemies "enemy"
   setup-world
+  setup-caves
+  setup-caves
   setup-caves
   reset-ticks
 end
@@ -41,39 +45,50 @@ to setup-caves
   set earth-top max-pycor - 7
   set tempx random-pxcor
   set tempy random-pycor
+  set tempbool? 0
   ask patch tempx tempy [
     ifelse pycor < earth-top[
       set pcolor blue
+      set tempbool? 1
+       set bool2? 1
       ][
       setup-caves
       ]
     ]
+ if tempbool? = 1[
   set tempx tempx + 1
-  ask patch tempx tempy [set pcolor blue ]
+  set tempbool?  0
+  ask patch tempx tempy [set pcolor red ]
+  ]
 
+ if bool2? = 1[
+  set tempx tempx - 2
+  set bool2?  0
+  ask patch tempx tempy [set pcolor green ]
+  ]
 
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
 206
 10
-645
-470
+616
+441
 -1
 -1
-13.0
+20.0
 1
 10
 1
 1
 1
 0
-0
+1
 0
 1
 0
-32
--32
+19
+-19
 0
 1
 1
