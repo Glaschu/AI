@@ -16,6 +16,8 @@ globals [
   cavey3
   cavex4
   cavey4
+  rockx
+  rocky
 
 ]
 
@@ -29,8 +31,11 @@ breed [Rocks Rock]     ;; breed of Rocks
 to Setup-Level
   clear-all
   ;;set-default-shape Enemies "enemy"
+  set-default-shape Rocks "square"
   setup-world
   setup-caves
+  spawn-rocks
+  setup-rocks
   reset-ticks
 end
 
@@ -59,23 +64,36 @@ to setup-caves
 
 
 end
+to spawn-rocks
+  setup-rocks
+  setup-rocks
+  setup-rocks
+end
 to build-caves1
-
+  let working 0
    set earth-top max-pycor - 2
    set earth-bottom max-pycor - 6
    set cavex1 random-pxcor
    set cavey1 random-pycor
 
    ask patch cavex1 cavey1 [
-     ifelse pycor < earth-top and pycor > earth-bottom [
+     ifelse pycor < earth-top and pycor > earth-bottom  [
        set pcolor black
+        set working 1
      ][
      build-caves1
      ]]
+       if working = 1 [
+set cavex1 cavex1 + 1
+ask patch cavex1 cavey1 [set pcolor black]
+set cavex1 cavex1 - 2
+ask patch cavex1 cavey1 [set pcolor black]
+]
+
 
 end
 to build-caves2
-
+  let working 0
    set earth-top max-pycor - 6
    set earth-bottom max-pycor - 13
      set cavex2 random-pxcor
@@ -83,14 +101,20 @@ to build-caves2
     ask patch cavex2 cavey2 [
      ifelse pycor < earth-top and pycor > earth-bottom [
        set pcolor black
+       set working 1
      ][
      build-caves2
      ]]
-
+    if working = 1 [
+set cavex2 cavex2 + 1
+ask patch cavex2 cavey2 [set pcolor black]
+set cavex2 cavex2 - 2
+ask patch cavex2 cavey2 [set pcolor black]
+]
 end
 
 to build-caves3
-
+  let working 0
    set earth-top max-pycor - 12
    set earth-bottom max-pycor - 19
      set cavex3 random-pxcor
@@ -98,13 +122,20 @@ to build-caves3
    ask patch cavex3 cavey3 [
      ifelse pycor < earth-top and pycor > earth-bottom [
        set pcolor black
+        set working 1
      ][
      build-caves3
      ]]
+       if working = 1 [
+set cavex3 cavex3 + 1
+ask patch cavex3 cavey3 [set pcolor black]
+set cavex3 cavex3 - 2
+ask patch cavex3 cavey3 [set pcolor black]
+]
 end
 
 to build-caves4
-
+  let working 0
    set earth-top max-pycor - 18
    set earth-bottom max-pycor - 24
      set cavex4 random-pxcor
@@ -112,13 +143,30 @@ to build-caves4
    ask patch cavex4 cavey4 [
      ifelse pycor < earth-top and pycor > earth-bottom [
        set pcolor black
+        set working 1
      ][
      build-caves4
      ]]
+       if working = 1 [
+set cavex4 cavex4 + 1
+ask patch cavex4 cavey4 [set pcolor black]
+set cavex4 cavex4 - 2
+ask patch cavex4 cavey4 [set pcolor black]
+]
 end
-
-
-
+to setup-rocks
+   set earth-top max-pycor - 3
+   set earth-bottom max-pycor - 22
+   set rockx random-pxcor
+   set rocky random-pycor
+ ask patch rockx rocky[
+   ifelse pycor < earth-top and pycor > earth-bottom and pcolor != black [
+      sprout-rocks 1[set color green]
+     ][
+     setup-rocks
+     ]
+   ]
+end
 
 @#$#@#$#@
 GRAPHICS-WINDOW
