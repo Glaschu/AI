@@ -31,12 +31,16 @@ breed [Rocks Rock]     ;; breed of Rocks
 to Setup-Level
   clear-all
   ;;set-default-shape Enemies "enemy"
-  set-default-shape Rocks "square"
+  ;;set-default-shape Rocks "square"
   setup-world
   setup-caves
   spawn-rocks
   setup-rocks
   reset-ticks
+end
+to play
+  move-rocks
+
 end
 
 to setup-world
@@ -155,6 +159,7 @@ ask patch cavex4 cavey4 [set pcolor black]
 ]
 end
 to setup-rocks
+
    set earth-top max-pycor - 3
    set earth-bottom max-pycor - 22
    set rockx random-pxcor
@@ -162,12 +167,20 @@ to setup-rocks
  ask patch rockx rocky[
    ifelse pycor < earth-top and pycor > earth-bottom and pcolor != black [
       sprout-rocks 1[set color green]
+
      ][
      setup-rocks
      ]
+
    ]
 end
+to move-rocks
+  ask rocks[
+    set heading 180
+    if [pcolor] of patch-ahead 1 = black[fd 1]
+    ]
 
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 206
@@ -204,6 +217,23 @@ BUTTON
 NIL
 Setup-Level
 NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+123
+140
+186
+173
+NIL
+play
+T
 1
 T
 OBSERVER
