@@ -31,7 +31,7 @@ breed [Rocks Rock]     ;; breed of Rocks
 to Setup-Level
   clear-all
   ;;set-default-shape Enemies "enemy"
-  ;;set-default-shape Rocks "square"
+  set-default-shape Rocks "square"
   setup-world
   setup-caves
   spawn-rocks
