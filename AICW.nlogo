@@ -39,8 +39,9 @@ to Setup-Level
   reset-ticks
 end
 to play
-  move-rocks
 
+  move-rocks
+tick
 end
 
 to setup-world
@@ -177,7 +178,9 @@ end
 to move-rocks
   ask rocks[
     set heading 180
-    if [pcolor] of patch-ahead 1 = black[fd 1]
+
+    ifelse [pcolor] of patch-ahead 1 = black[forward 1][]
+   ;;print("running")
     ]
 
 end
