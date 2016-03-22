@@ -21,7 +21,8 @@ globals [
 
 ]
 
-breed [Rocks Rock]     ;; breed of Rocks
+breed [Rocks Rock] ;; breed of Rocks
+breed [Enemies Enemy]  ;; breed of Enemies
 
 
 ;;
@@ -30,17 +31,20 @@ breed [Rocks Rock]     ;; breed of Rocks
 
 to Setup-Level
   clear-all
-  ;;set-default-shape Enemies "enemy"
+  set-default-shape Enemies "bug"
   set-default-shape Rocks "square"
+
   setup-world
   setup-caves
   spawn-rocks
   setup-rocks
+  setup-Enemies
   reset-ticks
 end
 to play
 
   move-rocks
+  move-Enemies
 tick
 end
 
@@ -183,6 +187,72 @@ to move-rocks
    ;;print("running")
     ]
 
+end
+to setup-Enemies
+   ask patch cavex1 cavey1[
+      sprout-enemies 1[set color blue]
+   ]
+    ask patch cavex2 cavey2[
+      sprout-enemies 1[set color blue]
+   ]
+     ask patch cavex3 cavey3[
+      sprout-enemies 1[set color blue]
+   ]
+      ask patch cavex4 cavey4[
+      sprout-enemies 1[set color blue]
+   ]
+      ask Enemies[
+        set heading 0
+        ]
+end
+
+to move-Enemies
+ ;; ifelse [pcolor] of patch-ahead 1 = black[forward 1][]
+ let notdone 0
+  ask Enemies[
+    if heading = 0[
+    ifelse [pcolor] of patch-ahead 1 = black[forward 1 set notdone 1]
+    [set heading 90
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
+      [set heading 180
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
+     [set heading 270
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
+        ]]
+    ]
+      if heading = 90[set heading 90
+    ifelse [pcolor] of patch-ahead 1 = black[forward 1 set notdone 1]
+    [set heading 0
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
+      [set heading 180
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
+     [set heading 270
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
+        ]]
+    ]
+         if heading = 180[set heading 180
+    ifelse [pcolor] of patch-ahead 1 = black[forward 1 set notdone 1]
+    [set heading 90
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
+      [set heading 270
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
+     [set heading 0
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
+        ]]
+    ]
+          if heading = 270[set heading 270
+    ifelse [pcolor] of patch-ahead 1 = black[forward 1 set notdone 1]
+    [set heading 0
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
+      [set heading 180
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
+     [set heading 90
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
+        ]]
+    ]
+
+
+    ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
