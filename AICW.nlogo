@@ -22,6 +22,7 @@ globals [
 ]
 
 breed [Rocks Rock]     ;; breed of Rocks
+breed [Players Player] ;; breed of Player
 
 
 ;;
@@ -36,10 +37,12 @@ to Setup-Level
   setup-caves
   spawn-rocks
   setup-rocks
+  setup-player
   reset-ticks
 end
-to play
 
+to play
+  player-manager
   move-rocks
 tick
 end
@@ -58,6 +61,52 @@ to setup-world
       [ set pcolor scale-color brown pycor -40 40 ] ;; earth
 
   ]
+end
+
+to setup-player
+  create-Players 1 [ setxy world-width / 2  -1 set color red set heading 0 ]
+
+end
+
+to move-left
+  ask Players [ set heading 270 ]
+  move-forward
+end
+
+to move-right
+  ask Players [ set heading 90 ]
+  move-forward
+end
+
+to move-up
+  ask Players [ set heading 0 ]
+  move-forward
+end
+
+to move-down
+  ask Players [ set heading 180 ]
+  move-forward
+end
+
+to move-forward
+  ask Players [
+    if not any? Rocks-on patch-ahead 1
+    [ forward 1 ]
+  ]
+end
+
+to player-manager
+  ask Players [
+    if pycor <= earth-top + 1 [
+    if pcolor != black [
+      set pcolor black
+      ]
+    ]
+
+    if any? Rocks-on patch-here [ die ]
+
+  ]
+
 end
 
 to setup-caves
@@ -186,10 +235,10 @@ to move-rocks
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-206
-10
-616
-541
+293
+22
+703
+553
 -1
 -1
 20.0
@@ -242,6 +291,74 @@ T
 OBSERVER
 NIL
 NIL
+NIL
+NIL
+1
+
+BUTTON
+22
+286
+114
+319
+NIL
+move-left
+NIL
+1
+T
+OBSERVER
+NIL
+A
+NIL
+NIL
+1
+
+BUTTON
+77
+249
+165
+282
+NIL
+move-up
+NIL
+1
+T
+OBSERVER
+NIL
+W
+NIL
+NIL
+1
+
+BUTTON
+120
+285
+222
+318
+NIL
+move-right
+NIL
+1
+T
+OBSERVER
+NIL
+D
+NIL
+NIL
+1
+
+BUTTON
+67
+327
+172
+360
+NIL
+move-down
+NIL
+1
+T
+OBSERVER
+NIL
+S
 NIL
 NIL
 1
@@ -589,7 +706,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2.1
+NetLogo 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
