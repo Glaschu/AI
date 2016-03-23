@@ -259,7 +259,7 @@ to move-Enemies
 
   ask Enemies[
     if heading = 0[
-    ifelse [pcolor] of patch-ahead 1 = black[forward 1 set notdone 1]
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
     [set heading 90
       ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
       [set heading 180
@@ -269,7 +269,7 @@ to move-Enemies
         ]]
     ]
       if heading = 90[set heading 90
-    ifelse [pcolor] of patch-ahead 1 = black[forward 1 set notdone 1]
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[forward 1 set notdone 1]
     [set heading 180
       ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
       [set heading 0
@@ -279,7 +279,7 @@ to move-Enemies
         ]]
     ]
          if heading = 180[set heading 180
-    ifelse [pcolor] of patch-ahead 1 = black[forward 1 set notdone 1]
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[forward 1 set notdone 1]
     [set heading 90
       ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
       [set heading 270
@@ -289,7 +289,7 @@ to move-Enemies
         ]]
     ]
           if heading = 270[set heading 270
-    ifelse [pcolor] of patch-ahead 1 = black[forward 1 set notdone 1]
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[forward 1 set notdone 1]
     [set heading 90
       ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
       [set heading 180
