@@ -21,9 +21,9 @@ globals [
 
 ]
 
-breed [Rocks Rock] ;; breed of Rocks
+breed [Rocks Rock]     ;; breed of Rocks
+breed [Players Player] ;; breed of Player
 breed [Enemies Enemy]  ;; breed of Enemies
-
 
 ;;
 ;; Setup Procedures
@@ -31,20 +31,21 @@ breed [Enemies Enemy]  ;; breed of Enemies
 
 to Setup-Level
   clear-all
-  set-default-shape Enemies "bug"
+  ;;set-default-shape Enemies "enemy"
   set-default-shape Rocks "square"
-
   setup-world
   setup-caves
   spawn-rocks
   setup-rocks
   setup-Enemies
+  setup-player
   reset-ticks
 end
-to play
 
-  move-rocks
+to play
+  player-manager
   move-Enemies
+  move-rocks
 tick
 end
 
@@ -62,6 +63,52 @@ to setup-world
       [ set pcolor scale-color brown pycor -40 40 ] ;; earth
 
   ]
+end
+
+to setup-player
+  create-Players 1 [ setxy world-width / 2  -1 set color red set heading 0 ]
+
+end
+
+to move-left
+  ask Players [ set heading 270 ]
+  move-forward
+end
+
+to move-right
+  ask Players [ set heading 90 ]
+  move-forward
+end
+
+to move-up
+  ask Players [ set heading 0 ]
+  move-forward
+end
+
+to move-down
+  ask Players [ set heading 180 ]
+  move-forward
+end
+
+to move-forward
+  ask Players [
+    if not any? Rocks-on patch-ahead 1
+    [ forward 1 ]
+  ]
+end
+
+to player-manager
+  ask Players [
+    if pycor <= earth-top + 1 [
+    if pcolor != black [
+      set pcolor black
+      ]
+    ]
+
+    if any? Rocks-on patch-here [ die ]
+
+  ]
+
 end
 
 to setup-caves
@@ -183,7 +230,7 @@ to move-rocks
   ask rocks[
     set heading 180
 
-    ifelse [pcolor] of patch-ahead 1 = black[forward 1][]
+    ifelse [pcolor] of patch-ahead 1 = black [wait 0.3 forward 1][]
    ;;print("running")
     ]
 
@@ -209,6 +256,7 @@ end
 to move-Enemies
  ;; ifelse [pcolor] of patch-ahead 1 = black[forward 1][]
  let notdone 0
+
   ask Enemies[
     if heading = 0[
     ifelse [pcolor] of patch-ahead 1 = black[forward 1 set notdone 1]
@@ -222,9 +270,9 @@ to move-Enemies
     ]
       if heading = 90[set heading 90
     ifelse [pcolor] of patch-ahead 1 = black[forward 1 set notdone 1]
-    [set heading 0
+    [set heading 180
       ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
-      [set heading 180
+      [set heading 0
       ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
      [set heading 270
        if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
@@ -242,11 +290,11 @@ to move-Enemies
     ]
           if heading = 270[set heading 270
     ifelse [pcolor] of patch-ahead 1 = black[forward 1 set notdone 1]
-    [set heading 0
+    [set heading 90
       ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
       [set heading 180
       ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
-     [set heading 90
+     [set heading 0
        if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
         ]]
     ]
@@ -256,10 +304,10 @@ to move-Enemies
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-206
-10
-616
-541
+293
+22
+703
+553
 -1
 -1
 20.0
@@ -312,6 +360,74 @@ T
 OBSERVER
 NIL
 NIL
+NIL
+NIL
+1
+
+BUTTON
+22
+286
+114
+319
+NIL
+move-left
+NIL
+1
+T
+OBSERVER
+NIL
+A
+NIL
+NIL
+1
+
+BUTTON
+77
+249
+165
+282
+NIL
+move-up
+NIL
+1
+T
+OBSERVER
+NIL
+W
+NIL
+NIL
+1
+
+BUTTON
+120
+285
+222
+318
+NIL
+move-right
+NIL
+1
+T
+OBSERVER
+NIL
+D
+NIL
+NIL
+1
+
+BUTTON
+67
+327
+172
+360
+NIL
+move-down
+NIL
+1
+T
+OBSERVER
+NIL
+S
 NIL
 NIL
 1
@@ -659,7 +775,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2.1
+NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
