@@ -44,8 +44,10 @@ end
 
 to play
   player-manager
-  move-Enemies
   move-rocks
+  every 1.5[
+  move-Enemies]
+
 tick
 end
 
