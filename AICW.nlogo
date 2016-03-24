@@ -19,6 +19,8 @@ globals [
   rockx
   rocky
 
+  currentEnemy
+
 ]
 
 breed [Rocks Rock]     ;; breed of Rocks
@@ -70,6 +72,12 @@ to setup-player
 
 end
 
+
+
+;;
+;; agent stuff
+;;
+
 to move-left
   ask Players [ set heading 270 ]
   move-forward
@@ -105,11 +113,74 @@ to player-manager
       ]
     ]
 
+    checkPatchAheadForRocks
+
+    ifelse any? Enemies in-radius 2
+    [
+      move-left
+    ]
+    [
+      moveTowardEnemy
+    ]
+
     if any? Rocks-on patch-here [ die ]
 
   ]
 
 end
+
+to find-enemy
+  ask Players [
+    checkPatchAheadForRocks
+    set currentEnemy min-one-of Enemies [xcor - ycor]
+    face currentEnemy
+  ]
+end
+
+to checkPatchAheadForRocks
+  ask Players
+  [
+    if any? Rocks-on patch-ahead 1
+    [
+      if heading = 180
+      [
+        move-right
+      ]
+      if heading = 270
+      [
+        move-down
+      ]
+      if heading = 90
+      [
+        move-down
+      ]
+      if heading = 0
+      [
+        move-left
+      ]
+    ]
+  ]
+end
+
+to moveTowardEnemy
+  ask Players
+  [
+    find-enemy
+    if heading <= 225 and heading >= 135 [
+      move-down
+    ]
+    if (heading >= 315 and heading <= 360) or (heading >= 0 and heading <= 45)[
+      move-up
+    ]
+    if heading < 135 and heading > 45 [
+      move-right
+    ]
+    if heading < 315 and heading > 225 [
+      move-left
+    ]
+  ]
+end
+
 
 to setup-caves
 
@@ -775,7 +846,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.3.1
+NetLogo 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
