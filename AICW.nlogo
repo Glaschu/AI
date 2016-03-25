@@ -19,11 +19,20 @@ globals [
   rockx
   rocky
 
+  holesDug
+  deathCount
+  dead
+  currentLocationX
+  currentLocationY
+
+
+
 ]
 
 breed [Rocks Rock]     ;; breed of Rocks
 breed [Players Player] ;; breed of Player
 breed [Enemies Enemy]  ;; breed of Enemies
+breed [HeatSpots HeatSpot] ;;death locations
 
 ;;
 ;; Setup Procedures
@@ -33,16 +42,39 @@ to Setup-Level
   clear-all
   ;;set-default-shape Enemies "enemy"
   set-default-shape Rocks "square"
+  set-default-shape HeatSpots "x"
+  set deathCount 0
+  set holesDug 0
   setup-world
   setup-caves
   spawn-rocks
   setup-rocks
   setup-Enemies
   setup-player
+  set dead false
   reset-ticks
 end
 
 to play
+  if dead
+  [
+    deathSpot
+    reset-level
+  ]
+  ifelse Death_Heat_Map
+  [
+    ask HeatSpots
+    [
+      show-turtle
+    ]
+  ]
+  [
+     ask HeatSpots
+    [
+      hide-turtle
+    ]
+  ]
+  print dead
   player-manager
   move-Enemies
   move-rocks
@@ -99,17 +131,56 @@ end
 
 to player-manager
   ask Players [
+    set currentLocationX xcor
+    set currentLocationY ycor
     if pycor <= earth-top + 1 [
     if pcolor != black [
       set pcolor black
+      set holesDug holesDug + 1
       ]
     ]
 
-    if any? Rocks-on patch-here [ die ]
+    if any? Rocks-on patch-here
+    [
+      set deathCount deathCount + 1
+      set dead true
+      die
+     ]
+
+    ifelse any? Players [] [print "no players"]
 
   ]
 
 end
+
+
+
+
+
+to reset-level
+  set dead false
+  clear-things
+ ;; clear-patches
+  setup-world
+  setup-caves
+  spawn-rocks
+  setup-rocks
+  setup-Enemies
+  setup-player
+end
+
+to deathSpot
+  ask patch currentLocationX currentLocationY
+  [
+    sprout-HeatSpots 1[set color yellow]
+  ]
+end
+
+to clear-things
+  ask Rocks [die]
+  ask Enemies [die]
+end
+
 
 to setup-caves
 
@@ -218,7 +289,7 @@ to setup-rocks
    set rocky random-pycor
  ask patch rockx rocky[
    ifelse pycor < earth-top and pycor > earth-bottom and pcolor != black [
-      sprout-rocks 1[set color green]
+      sprout-rocks 1[set color grey]
 
      ][
      setup-rocks
@@ -331,10 +402,10 @@ ticks
 30.0
 
 BUTTON
-79
-63
-183
-96
+11
+64
+115
+97
 NIL
 Setup-Level
 NIL
@@ -348,10 +419,10 @@ NIL
 1
 
 BUTTON
-123
-140
-186
-173
+124
+66
+187
+99
 NIL
 play
 T
@@ -431,6 +502,39 @@ S
 NIL
 NIL
 1
+
+MONITOR
+21
+138
+96
+183
+No. Deaths
+deathCount
+17
+1
+11
+
+SWITCH
+22
+191
+174
+224
+Death_Heat_Map
+Death_Heat_Map
+0
+1
+-1000
+
+MONITOR
+109
+138
+178
+183
+Holes Dug
+holesDug
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -775,7 +879,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.3.1
+NetLogo 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
