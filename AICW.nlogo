@@ -27,6 +27,8 @@ breed [Rocks Rock]     ;; breed of Rocks
 breed [Players Player] ;; breed of Player
 breed [Enemies Enemy]  ;; breed of Enemies
 
+Enemies-own [ playerInArea ]
+
 ;;
 ;; Setup Procedures
 ;;
@@ -35,6 +37,7 @@ to Setup-Level
   clear-all
   ;;set-default-shape Enemies "enemy"
   set-default-shape Rocks "square"
+  set-default-shape Players "bug"
   setup-world
   setup-caves
   spawn-rocks
@@ -45,6 +48,7 @@ to Setup-Level
 end
 
 to play
+  wait 0.5
   player-manager
   move-Enemies
   move-rocks
@@ -113,14 +117,17 @@ to player-manager
       ]
     ]
 
-    checkPatchAheadForRocks
+    if AgentPlay
+    [
+      checkPatchAheadForRocks
 
-    ifelse any? Enemies in-radius 2
-    [
-      move-left
-    ]
-    [
-      moveTowardEnemy
+      ifelse any? Enemies in-radius 2
+      [
+        move-left
+      ]
+      [
+        moveTowardEnemy
+      ]
     ]
 
     if any? Rocks-on patch-here [ die ]
@@ -131,7 +138,6 @@ end
 
 to find-enemy
   ask Players [
-    checkPatchAheadForRocks
     set currentEnemy min-one-of Enemies [xcor - ycor]
     face currentEnemy
   ]
@@ -320,58 +326,86 @@ to setup-Enemies
       sprout-enemies 1[set color blue]
    ]
       ask Enemies[
-        set heading 0
+        set heading 90
         ]
 end
 
 to move-Enemies
- ;; ifelse [pcolor] of patch-ahead 1 = black[forward 1][]
- let notdone 0
+ enemy-CheckForPlayer
+ ask Enemies
+ [
+   ifelse playerInArea
+   [
+     enemy-ChasePlayer
+   ]
+   [
+     enemy-MoveInCave
+   ]
 
-  ask Enemies[
-    if heading = 0[
-    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
-    [set heading 90
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
-      [set heading 180
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
-     [set heading 270
-       if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
-        ]]
-    ]
-      if heading = 90[set heading 90
-    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[forward 1 set notdone 1]
-    [set heading 180
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
-      [set heading 0
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
-     [set heading 270
-       if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
-        ]]
-    ]
-         if heading = 180[set heading 180
-    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[forward 1 set notdone 1]
-    [set heading 90
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
-      [set heading 270
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
-     [set heading 0
-       if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
-        ]]
-    ]
-          if heading = 270[set heading 270
-    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[forward 1 set notdone 1]
-    [set heading 90
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
-      [set heading 180
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
-     [set heading 0
-       if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
-        ]]
-    ]
+ ]
+end
 
-
+to enemy-CheckForPlayer
+  ask Enemies
+  [
+    ifelse any? Players in-radius 3
+    [
+      set playerInArea true
     ]
+    [
+      set playerInArea false
+    ]
+  ]
+end
+
+to enemy-MoveInCave
+  ask Enemies
+  [
+    ifelse [pcolor] of patch-ahead 1 = black
+    [
+      forward 1
+    ]
+    [
+      enemy-ChangeDirection
+    ]
+  ]
+end
+
+to enemy-ChangeDirection
+  ask Enemies
+  [
+    set heading heading + 180
+  ]
+end
+
+to enemy-ChasePlayer
+  enemy-FacePlayer
+  if heading <= 225 and heading >= 135 [
+      set heading 180
+      forward 1
+    ]
+    if (heading >= 315 and heading <= 360) or (heading >= 0 and heading <= 45)[
+      set heading 0
+      forward 1
+    ]
+    if heading < 135 and heading > 45 [
+      set heading 90
+      forward 1
+    ]
+    if heading < 315 and heading > 225 [
+      set heading 270
+      forward 1
+    ]
+end
+
+to enemy-FacePlayer
+  Ask Enemies
+  [
+    if playerInArea
+    [
+      face min-one-of Players [xcor - ycor]
+    ]
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -502,6 +536,17 @@ S
 NIL
 NIL
 1
+
+SWITCH
+71
+395
+189
+428
+AgentPlay
+AgentPlay
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
