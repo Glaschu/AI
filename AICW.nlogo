@@ -19,6 +19,8 @@ globals [
   rockx
   rocky
 
+  currentEnemy
+
 ]
 
 breed [Rocks Rock]     ;; breed of Rocks
@@ -44,10 +46,9 @@ end
 
 to play
   player-manager
-  move-rocks
-  every 1.5[
+   every 1.5[
   move-Enemies]
-
+  move-rocks
 tick
 end
 
@@ -71,6 +72,12 @@ to setup-player
   create-Players 1 [ setxy world-width / 2  -1 set color red set heading 0 ]
 
 end
+
+
+
+;;
+;; agent stuff
+;;
 
 to move-left
   ask Players [ set heading 270 ]
@@ -107,11 +114,74 @@ to player-manager
       ]
     ]
 
+    checkPatchAheadForRocks
+
+    ifelse any? Enemies in-radius 2
+    [
+      move-left
+    ]
+    [
+      moveTowardEnemy
+    ]
+
     if any? Rocks-on patch-here [ die ]
 
   ]
 
 end
+
+to find-enemy
+  ask Players [
+    checkPatchAheadForRocks
+    set currentEnemy min-one-of Enemies [xcor - ycor]
+    face currentEnemy
+  ]
+end
+
+to checkPatchAheadForRocks
+  ask Players
+  [
+    if any? Rocks-on patch-ahead 1
+    [
+      if heading = 180
+      [
+        move-right
+      ]
+      if heading = 270
+      [
+        move-down
+      ]
+      if heading = 90
+      [
+        move-down
+      ]
+      if heading = 0
+      [
+        move-left
+      ]
+    ]
+  ]
+end
+
+to moveTowardEnemy
+  ask Players
+  [
+    find-enemy
+    if heading <= 225 and heading >= 135 [
+      move-down
+    ]
+    if (heading >= 315 and heading <= 360) or (heading >= 0 and heading <= 45)[
+      move-up
+    ]
+    if heading < 135 and heading > 45 [
+      move-right
+    ]
+    if heading < 315 and heading > 225 [
+      move-left
+    ]
+  ]
+end
+
 
 to setup-caves
 
@@ -251,14 +321,11 @@ to setup-Enemies
       sprout-enemies 1[set color blue]
    ]
       ask Enemies[
-        set heading 180
+        set heading 0
         ]
 end
 
 to move-Enemies
- ;; ifelse [pcolor] of patch-ahead 1 = black[forward 1][]
-
-
   ask Enemy 4[
     let head 0
     let notdone 0
