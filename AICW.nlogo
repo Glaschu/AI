@@ -19,12 +19,16 @@ globals [
   rockx
   rocky
 
+
   holesDug
   deathCount
   dead
   currentLocationX
   currentLocationY
 
+
+
+  currentEnemy
 
 
 ]
@@ -76,7 +80,8 @@ to play
   ]
   print dead
   player-manager
-  move-Enemies
+   every 1.5[
+  move-Enemies]
   move-rocks
 tick
 end
@@ -101,6 +106,12 @@ to setup-player
   create-Players 1 [ setxy world-width / 2  -1 set color red set heading 0 ]
 
 end
+
+
+
+;;
+;; agent stuff
+;;
 
 to move-left
   ask Players [ set heading 270 ]
@@ -140,6 +151,7 @@ to player-manager
       ]
     ]
 
+
     if any? Rocks-on patch-here
     [
       set deathCount deathCount + 1
@@ -149,9 +161,23 @@ to player-manager
 
     ifelse any? Players [] [print "no players"]
 
+    checkPatchAheadForRocks
+
+    ifelse any? Enemies in-radius 2
+    [
+      move-left
+    ]
+    [
+      moveTowardEnemy
+    ]
+
+    if any? Rocks-on patch-here [ die ]
+
+
   ]
 
 end
+
 
 
 
@@ -179,6 +205,58 @@ end
 to clear-things
   ask Rocks [die]
   ask Enemies [die]
+end
+to find-enemy
+  ask Players [
+    checkPatchAheadForRocks
+    set currentEnemy min-one-of Enemies [xcor - ycor]
+    face currentEnemy
+  ]
+end
+
+to checkPatchAheadForRocks
+  ask Players
+  [
+    if any? Rocks-on patch-ahead 1
+    [
+      if heading = 180
+      [
+        move-right
+      ]
+      if heading = 270
+      [
+        move-down
+      ]
+      if heading = 90
+      [
+        move-down
+      ]
+      if heading = 0
+      [
+        move-left
+      ]
+    ]
+  ]
+end
+
+to moveTowardEnemy
+  ask Players
+  [
+    find-enemy
+    if heading <= 225 and heading >= 135 [
+      move-down
+    ]
+    if (heading >= 315 and heading <= 360) or (heading >= 0 and heading <= 45)[
+      move-up
+    ]
+    if heading < 135 and heading > 45 [
+      move-right
+    ]
+    if heading < 315 and heading > 225 [
+      move-left
+    ]
+  ]
+
 end
 
 
@@ -325,52 +403,196 @@ to setup-Enemies
 end
 
 to move-Enemies
- ;; ifelse [pcolor] of patch-ahead 1 = black[forward 1][]
- let notdone 0
-
-  ask Enemies[
-    if heading = 0[
-    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
+  ask Enemy 4[
+    let head 0
+    let notdone 0
+    ;;print(heading)
+    if heading = 0[set heading 0;;up
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [ set head 0 forward 1 set notdone 1]
     [set heading 90
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
-      [set heading 180
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
-     [set heading 270
-       if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
-        ]]
-    ]
-      if heading = 90[set heading 90
-    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[forward 1 set notdone 1]
-    [set heading 180
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
-      [set heading 0
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
-     [set heading 270
-       if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
-        ]]
-    ]
-         if heading = 180[set heading 180
-    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[forward 1 set notdone 1]
-    [set heading 90
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 90 forward 1 set notdone 1 ]
       [set heading 270
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
-     [set heading 0
-       if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 270 forward 1 set notdone 1]
+     [set heading 180
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 180 forward 1 set notdone 1] ]
         ]]
     ]
-          if heading = 270[set heading 270
-    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[forward 1 set notdone 1]
+
+         if heading = 180[set heading 180 ;;down
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[set head 180 forward 1 set notdone 1]
     [set heading 90
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1 ]
-      [set heading 180
-      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1]
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 90 forward 1 set notdone 1 ]
+      [set heading 270
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 270 forward 1 set notdone 1]
      [set heading 0
-       if [pcolor] of patch-ahead 1 = black and notdone = 0 [forward 1 set notdone 1] ]
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 0 forward 1 set notdone 1] ]
+        ]]
+    ]
+          if heading = 270[set heading 270;;left
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[set head 270  forward 1 set notdone 1]
+    [set heading 180
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 180 forward 1 set notdone 1 ]
+      [set heading 0
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 0 forward 1 set notdone 1]
+     [set heading 90
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 90   forward 1 set notdone 1] ]
+        ]]
+    ]
+            if heading = 90[set heading 90;;right
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[set head 90 forward 1 set notdone 1]
+    [set heading 180
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 180 forward 1 set notdone 1 ]
+      [set heading 0
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 0 forward 1 set notdone 1]
+     [set heading 270
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 270 fd 1 set notdone 1] ]
+        ]]
+    ]
+       set heading head
+    ]
+
+  ask Enemy 5[
+    let head 0
+    let notdone 0
+    ;;print(heading)
+    if heading = 0[set heading 0;;up
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [ set head 0 forward 1 set notdone 1]
+    [set heading 90
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 90 forward 1 set notdone 1 ]
+      [set heading 270
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 270 forward 1 set notdone 1]
+     [set heading 180
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 180 forward 1 set notdone 1] ]
         ]]
     ]
 
+         if heading = 180[set heading 180 ;;down
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[set head 180 forward 1 set notdone 1]
+    [set heading 90
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 90 forward 1 set notdone 1 ]
+      [set heading 270
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 270 forward 1 set notdone 1]
+     [set heading 0
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 0 forward 1 set notdone 1] ]
+        ]]
+    ]
+          if heading = 270[set heading 270;;left
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[set head 270  forward 1 set notdone 1]
+    [set heading 180
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 180 forward 1 set notdone 1 ]
+      [set heading 0
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 0 forward 1 set notdone 1]
+     [set heading 90
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 90   forward 1 set notdone 1] ]
+        ]]
+    ]
+            if heading = 90[set heading 90;;right
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[set head 90 forward 1 set notdone 1]
+    [set heading 180
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 180 forward 1 set notdone 1 ]
+      [set heading 0
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 0 forward 1 set notdone 1]
+     [set heading 270
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 270 fd 1 set notdone 1] ]
+        ]]
+    ]
+       set heading head
+    ]
 
+  ask Enemy 6[
+    let head 0
+    let notdone 0
+    ;;print(heading)
+    if heading = 0[set heading 0;;up
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [ set head 0 forward 1 set notdone 1]
+    [set heading 90
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 90 forward 1 set notdone 1 ]
+      [set heading 270
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 270 forward 1 set notdone 1]
+     [set heading 180
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 180 forward 1 set notdone 1] ]
+        ]]
+    ]
+
+         if heading = 180[set heading 180 ;;down
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[set head 180 forward 1 set notdone 1]
+    [set heading 90
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 90 forward 1 set notdone 1 ]
+      [set heading 270
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 270 forward 1 set notdone 1]
+     [set heading 0
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 0 forward 1 set notdone 1] ]
+        ]]
+    ]
+          if heading = 270[set heading 270;;left
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[set head 270  forward 1 set notdone 1]
+    [set heading 180
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 180 forward 1 set notdone 1 ]
+      [set heading 0
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 0 forward 1 set notdone 1]
+     [set heading 90
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 90   forward 1 set notdone 1] ]
+        ]]
+    ]
+            if heading = 90[set heading 90;;right
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[set head 90 forward 1 set notdone 1]
+    [set heading 180
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 180 forward 1 set notdone 1 ]
+      [set heading 0
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 0 forward 1 set notdone 1]
+     [set heading 270
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 270 fd 1 set notdone 1] ]
+        ]]
+    ]
+       set heading head
+    ]
+
+  ask Enemy 7[
+    let head 0
+    let notdone 0
+    ;;print(heading)
+    if heading = 0[set heading 0;;up
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [ set head 0 forward 1 set notdone 1]
+    [set heading 90
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 90 forward 1 set notdone 1 ]
+      [set heading 270
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 270 forward 1 set notdone 1]
+     [set heading 180
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 180 forward 1 set notdone 1] ]
+        ]]
+    ]
+
+         if heading = 180[set heading 180 ;;down
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[set head 180 forward 1 set notdone 1]
+    [set heading 90
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 90 forward 1 set notdone 1 ]
+      [set heading 270
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 270 forward 1 set notdone 1]
+     [set heading 0
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 0 forward 1 set notdone 1] ]
+        ]]
+    ]
+          if heading = 270[set heading 270;;left
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[set head 270  forward 1 set notdone 1]
+    [set heading 180
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 180 forward 1 set notdone 1 ]
+      [set heading 0
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 0 forward 1 set notdone 1]
+     [set heading 90
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 90   forward 1 set notdone 1] ]
+        ]]
+    ]
+            if heading = 90[set heading 90;;right
+    ifelse [pcolor] of patch-ahead 1 = black and notdone = 0[set head 90 forward 1 set notdone 1]
+    [set heading 180
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 180 forward 1 set notdone 1 ]
+      [set heading 0
+      ifelse [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 0 forward 1 set notdone 1]
+     [set heading 270
+       if [pcolor] of patch-ahead 1 = black and notdone = 0 [set head 270 fd 1 set notdone 1] ]
+        ]]
+    ]
+       set heading head
     ]
 end
 @#$#@#$#@
@@ -879,7 +1101,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.3
+NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
