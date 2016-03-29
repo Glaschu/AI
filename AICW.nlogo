@@ -20,8 +20,13 @@ globals [
   rocky
 
   holesDug
+  winCount
+
   deathCount
   dead
+  rockDeath
+  enemyDeath
+
   currentLocationX
   currentLocationY
 
@@ -30,6 +35,9 @@ globals [
   currentHeadingForPlayer
 
   numEnemies
+
+  bulletsFired
+
 
 
 ]
@@ -44,6 +52,8 @@ Enemies-own [ playerInArea
   alive ]
 
 Bullets-own [ lives ]
+
+Players-Own [ pen ]
 ;;
 ;; Setup Procedures
 ;;
@@ -54,7 +64,10 @@ to Setup-Level
   set-default-shape HeatSpots "x"
   set dead false
   set deathCount 0
+  set rockDeath 0
+  set enemyDeath 0
   set holesDug 0
+  set bulletsFired 0
   set numEnemies 4
   setup-world
   setup-caves
@@ -153,7 +166,12 @@ to player-manager
       ]
     ]
 
-    if any? Enemies-on patch-here [ set dead true die ]
+    if any? Enemies-on patch-here
+    [
+      set enemyDeath enemyDeath + 1
+      set dead true
+      die
+     ]
 
     set currentHeadingForPlayer heading
 
@@ -185,6 +203,7 @@ to player-manager
 
     if any? Rocks-on patch-here
     [
+      set rockDeath rockDeath + 1
       set dead true
       die
      ]
@@ -212,6 +231,7 @@ to find-enemy
     face currentEnemy
     ]
     [
+      set winCount winCount + 1
       set dead true
       die
     ]
@@ -252,7 +272,8 @@ to shoot
   ask patch currentLocationX currentLocationY
   [
     every 0.5 [
-    sprout-Bullets 1 [ set color orange set heading currentHeadingForPlayer set lives 6 ]
+    sprout-Bullets 1 [ set color green set heading currentHeadingForPlayer set lives 6 ]
+     set bulletsFired bulletsFired + 1
     ]
   ]
 end
@@ -320,7 +341,6 @@ to reset-level
   set dead false
   set numEnemies 4
   clear-things
- ;; clear-patches
   setup-world
   setup-caves
   spawn-rocks
@@ -965,19 +985,19 @@ NIL
 MONITOR
 21
 138
-96
+132
 183
-No. Deaths
+No. Deaths/Loses
 deathCount
 17
 1
 11
 
 SWITCH
-22
-191
-174
-224
+10
+379
+162
+412
 Death_Heat_Map
 Death_Heat_Map
 0
@@ -985,10 +1005,10 @@ Death_Heat_Map
 -1000
 
 MONITOR
-109
-138
-178
+114
+192
 183
+237
 Holes Dug
 holesDug
 17
@@ -996,10 +1016,10 @@ holesDug
 11
 
 SWITCH
-129
-390
-260
-423
+11
+414
+142
+447
 AgentPlay
 AgentPlay
 0
@@ -1007,10 +1027,10 @@ AgentPlay
 -1000
 
 BUTTON
-180
-244
-247
-277
+173
+249
+240
+282
 Shoot
 shoot
 NIL
@@ -1022,6 +1042,66 @@ E
 NIL
 NIL
 1
+
+MONITOR
+22
+192
+102
+237
+Bullets Fired
+bulletsFired
+17
+1
+11
+
+PLOT
+780
+70
+980
+220
+Killed By
+Time
+Amount
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"Rock" 1.0 0 -2064490 true "" "plot rockDeath"
+"Enemy" 1.0 0 -13345367 true "" "plot enemyDeath"
+
+MONITOR
+140
+138
+197
+183
+Wins
+winCount
+17
+1
+11
+
+PLOT
+780
+224
+980
+374
+Wins/Loses
+Time
+Amount
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"Wins" 1.0 0 -955883 true "" "plot winCount"
+"Loses" 1.0 0 -13840069 true "" "plot deathCount"
 
 @#$#@#$#@
 ## WHAT IS IT?
