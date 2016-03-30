@@ -27,6 +27,8 @@ globals [
 
   currentEnemy
 
+  commentry
+  enemyChase
 
 ]
 
@@ -39,6 +41,8 @@ Enemies-own [ playerInArea ]
 ;;
 ;; Setup Procedures
 ;;
+
+
 
 to Setup-Level
   clear-all
@@ -54,6 +58,8 @@ to Setup-Level
   setup-player
   set dead false
   reset-ticks
+  Output-print "Contestant Ready"
+  set enemyChase 0
 end
 
 to play
@@ -61,6 +67,7 @@ to play
   [
     deathSpot
     reset-level
+    Output-print "Aww He Daed"
   ]
   ifelse Death_Heat_Map
   [
@@ -85,6 +92,7 @@ tick
 end
 
 to setup-world
+  Output-print "A Whole New World"
   set sky-top max-pycor - 0
   set earth-top max-pycor - 1
   ask patches [  ;; set colors for the different sections of the world
@@ -142,6 +150,10 @@ to player-manager
       set holesDug holesDug + 1
       ]
     ]
+
+    if holesDug = 10[Output-print "Dig a Tunnel, Dig Dig A Tunnel"]
+    if holesDug = 25[Output-print "Time To GO Deeper"]
+    if holesDug = 50[Output-print "Is There Any Dirt Left?"]
 
     if AgentPlay
     [
@@ -223,6 +235,7 @@ end
 
 
 to reset-level
+  Output-print "Groundhog Day"
   set dead false
   clear-things
  ;; clear-patches
@@ -366,7 +379,8 @@ to move-rocks
   ask rocks[
     set heading 180
 
-    ifelse [pcolor] of patch-ahead 1 = black [wait 0.3 forward 1][]
+    ifelse [pcolor] of patch-ahead 1 = black [wait 0.3 forward 1][ ]
+
    ;;print("running")
     ]
 
@@ -438,6 +452,9 @@ to enemy-ChangeDirection
 end
 
 to enemy-ChasePlayer
+  if enemyChase = 0[
+  Output-print "Hes Been Spotted!"
+  set enemyChase 1 ]
   enemy-FacePlayer
   if heading <= 225 and heading >= 135 [
       set heading 180
@@ -688,10 +705,10 @@ ticks
 30.0
 
 BUTTON
-11
-64
-115
-97
+14
+27
+118
+60
 NIL
 Setup-Level
 NIL
@@ -705,10 +722,10 @@ NIL
 1
 
 BUTTON
-124
-66
-187
-99
+135
+27
+198
+60
 NIL
 play
 T
@@ -722,9 +739,9 @@ NIL
 1
 
 BUTTON
-22
+41
 286
-114
+133
 319
 NIL
 move-left
@@ -739,9 +756,9 @@ NIL
 1
 
 BUTTON
-77
+96
 249
-165
+184
 282
 NIL
 move-up
@@ -756,9 +773,9 @@ NIL
 1
 
 BUTTON
-120
+139
 285
-222
+241
 318
 NIL
 move-right
@@ -773,9 +790,9 @@ NIL
 1
 
 BUTTON
-67
+86
 327
-172
+191
 360
 NIL
 move-down
@@ -790,10 +807,10 @@ NIL
 1
 
 MONITOR
-21
-138
-96
-183
+15
+77
+90
+122
 No. Deaths
 deathCount
 17
@@ -801,10 +818,10 @@ deathCount
 11
 
 SWITCH
-22
-191
-174
-224
+15
+143
+167
+176
 Death_Heat_Map
 Death_Heat_Map
 0
@@ -812,10 +829,10 @@ Death_Heat_Map
 -1000
 
 MONITOR
-109
-138
-178
-183
+103
+77
+172
+122
 Holes Dug
 holesDug
 17
@@ -823,15 +840,22 @@ holesDug
 11
 
 SWITCH
-129
-390
-260
-423
+16
+195
+147
+228
 AgentPlay
 AgentPlay
 0
 1
 -1000
+
+OUTPUT
+6
+368
+289
+493
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1176,7 +1200,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2.1
+NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
