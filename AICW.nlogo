@@ -38,6 +38,8 @@ globals [
 
   bulletsFired
 
+  tickAmount
+
 
 
 ]
@@ -77,9 +79,11 @@ to Setup-Level
   setup-player
   set dead false
   reset-ticks
+  set tickAmount (TickTimer)
 end
 
 to play
+  if ticks >= tickAmount [ stop ]
   if dead
   [
     if numEnemies > 0 [ deathSpot ]
@@ -882,9 +886,9 @@ ticks
 
 BUTTON
 11
-64
+24
 115
-97
+57
 NIL
 Setup-Level
 NIL
@@ -898,10 +902,10 @@ NIL
 1
 
 BUTTON
-124
-66
-187
-99
+117
+25
+180
+58
 NIL
 play
 T
@@ -915,10 +919,10 @@ NIL
 1
 
 BUTTON
-22
-286
-114
-319
+7
+203
+99
+236
 NIL
 move-left
 NIL
@@ -932,10 +936,10 @@ NIL
 1
 
 BUTTON
-77
-249
-165
-282
+62
+166
+150
+199
 NIL
 move-up
 NIL
@@ -949,10 +953,10 @@ NIL
 1
 
 BUTTON
-120
-285
-222
-318
+105
+202
+207
+235
 NIL
 move-right
 NIL
@@ -966,10 +970,10 @@ NIL
 1
 
 BUTTON
-67
-327
-172
-360
+52
+244
+157
+277
 NIL
 move-down
 NIL
@@ -983,10 +987,10 @@ NIL
 1
 
 MONITOR
-21
-138
-132
-183
+11
+62
+122
+107
 No. Deaths/Loses
 deathCount
 17
@@ -994,10 +998,10 @@ deathCount
 11
 
 SWITCH
-10
-379
-162
-412
+7
+287
+159
+320
 Death_Heat_Map
 Death_Heat_Map
 0
@@ -1005,10 +1009,10 @@ Death_Heat_Map
 -1000
 
 MONITOR
-114
-192
-183
-237
+104
+116
+173
+161
 Holes Dug
 holesDug
 17
@@ -1016,10 +1020,10 @@ holesDug
 11
 
 SWITCH
-11
-414
-142
-447
+8
+322
+139
+355
 AgentPlay
 AgentPlay
 0
@@ -1027,10 +1031,10 @@ AgentPlay
 -1000
 
 BUTTON
-173
-249
-240
-282
+212
+165
+279
+198
 Shoot
 shoot
 NIL
@@ -1044,10 +1048,10 @@ NIL
 1
 
 MONITOR
-22
-192
-102
-237
+12
+116
+92
+161
 Bullets Fired
 bulletsFired
 17
@@ -1074,10 +1078,10 @@ PENS
 "Enemy" 1.0 0 -13345367 true "" "plot enemyDeath"
 
 MONITOR
-140
-138
-197
-183
+130
+62
+187
+107
 Wins
 winCount
 17
@@ -1102,6 +1106,21 @@ true
 PENS
 "Wins" 1.0 0 -955883 true "" "plot winCount"
 "Loses" 1.0 0 -13840069 true "" "plot deathCount"
+
+SLIDER
+9
+374
+181
+407
+TickTimer
+TickTimer
+0
+1000
+500
+25
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
